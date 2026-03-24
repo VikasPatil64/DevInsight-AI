@@ -8,11 +8,11 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import builtins
 # GitHub API helpers
-from github_api import get_user_profile, get_user_repos
-from llm_insight import generate_llm_insight
+from app.github_api import get_user_profile, get_user_repos
+from app.llm_insight import generate_llm_insight
 # Analytics + Scoring
-from analysis import analyze_repositories
-from scoring import calculate_developer_score
+from app.analysis import analyze_repositories
+from app.scoring import calculate_developer_score
 
 
 # -------------------------------
