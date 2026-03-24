@@ -1,9 +1,10 @@
 from urllib import response
-
+from dotenv import load_dotenv
+load_dotenv()
 import requests
 import os
 
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 def generate_llm_insight(profile, analytics):
 
