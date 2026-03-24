@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DevInsight Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <a href="/" class="back-btn">← Back to Search</a>
+
+    <!-- PROFILE + SCORE WRAPPER -->
+    <div class="top-section">
+
+        <!-- PROFILE HEADER -->
+        <div class="profile-header">
+            <img src="{{ avatar_url }}" class="avatar">
+
+            <div class="profile-text">
+                <h2>{{ name }}</h2>
+                <p>@{{ username }}</p>
+                <p class="bio">{{ bio }}</p>
+
+                <div class="profile-badges">
+                    <span class="badge">📅 Joined {{ created_at }}</span>
+                    <span class="badge">🔥 {{ analytics.days_since_last_update }} days inactive</span>
+                    <span class="badge">💻 {{ analytics.most_used_language }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCORE CARD -->
+        <div class="score-card">
+            <h1>{{ developer_score }}</h1>
+            <p>{{ category }}</p>
+            <div class="score-progress"> 
+                <div class="score-fill" style="width:29%">
+                    
+                </div> 
+            </div>
+        </div>
+        <div class="section-box">
+            <h3>AI Developer Insight</h3>
+            <div class="ai-text">
+                {{ ai_insight }}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GITHUB STATS -->
+    <div class="section-box">
+        <h3>GitHub Stats</h3>
+
+        <div class="metrics-grid">
+
+            <div class="metric-card">
+                <p>{{ public_repos }}</p>
+                <h4>Total Repos</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ followers }}</p>
+                <h4>Followers</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ following }}</p>
+                <h4>Following</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ analytics.average_stars }}</p>
+                <h4>Avg Stars</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ analytics.average_forks }}</p>
+                <h4>Avg Forks</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ analytics.days_since_last_update }} days</p>
+                <h4>Last Active</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ analytics.most_used_language }}</p>
+                <h4>Primary Language</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ analytics.top_repo_name }}</p>
+                <h4>Top Repo</h4>
+            </div>
+
+            <div class="metric-card">
+                <p>{{ analytics.total_languages }}</p>
+                <h4>Total Languages</h4>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="section-box">
+        <h3>Charts</h3>
+
+        <div class="charts-section">
+
+            <div class="chart-box">
+                <h4>Language Distribution</h4>
+                <canvas id="languageChart"></canvas>
+            </div>
+
+            <div class="chart-box">
+                <h4>Top 5 Repositories</h4>
+                <canvas id="repoChart"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- POPULAR PROJECTS -->
+    <div class="section-box">
+        <h3>Popular Projects</h3>
+
+        <div class="repo-grid">
+            {% for repo in top_repos %}
+            <div class="repo-card">
+                <h4>{{ repo.name }}</h4>
+                <p>{{ repo.description or "No description available" }}</p>
+
+                <div class="repo-meta">
+                    ⭐ {{ repo.stargazers_count }}
+                    🍴 {{ repo.forks_count }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CHART SCRIPTS -->
+<script>
+const languageLabels = JSON.parse('{{ language_labels | tojson | safe }}');
+const languageValues = JSON.parse('{{ language_values | tojson |safe}}');
+
+new Chart(document.getElementById('languageChart'), {
+    type: 'doughnut',
+    data: {
+        labels: languageLabels,
+        datasets: [{
+            data: languageValues,
+            backgroundColor: [
+                '#3b82f6',
+                '#10b981',
+                '#f59e0b',
+                '#ef4444',
+                '#8b5cf6'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: '#cbd5e1' }
+            }
+        }
+    }
+});
+</script>
+
+<script>
+const repoLabels = JSON.parse('{{ repo_labels | tojson |safe}}');
+const repoStars = JSON.parse('{{ repo_stars | tojson |safe}}');
+
+new Chart(document.getElementById('repoChart'), {
+    type: 'bar',
+    data: {
+        labels: repoLabels,
+        datasets: [{
+            data: repoStars,
+            backgroundColor: '#3b82f6'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { color: '#cbd5e1' }
+            },
+            x: {
+                ticks: { color: '#cbd5e1' }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

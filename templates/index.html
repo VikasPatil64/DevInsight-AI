@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DevInsight AI</title>
+    <link rel="stylesheet" href="/static/index.css">
+</head>
+
+<body>
+
+<div class="landing">
+
+    <h1 class="logo">🚀 DevInsight AI</h1>
+
+    <p class="tagline">
+        Developer intelligence from GitHub data
+    </p>
+
+    <!-- FORM (NO JS NEEDED FOR SUBMIT) -->
+    <form action="/dashboard" method="get" class="search-form">
+
+        <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="Enter GitHub Username"
+            required
+        />
+
+        <button type="submit">Analyze</button>
+
+    </form>
+
+    <!-- RECENT SEARCHES -->
+    <div class="recent-box">
+
+        <h3>Recent Profiles</h3>
+
+        <div id="recentList" class="recent-list"></div>
+
+    </div>
+
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>

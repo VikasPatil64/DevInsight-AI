@@ -1,0 +1,320 @@
+/* =========================
+   GLOBAL
+========================= */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #07122a;
+    color: white;
+}
+
+/* MAIN CONTAINER (MOST IMPORTANT FIX) */
+.dashboard-container {
+    max-width: 1200px;   /* ⭐ makes it like reference */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* FIX TOP SECTION ALIGNMENT */
+.top-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* =========================
+   BACK BUTTON
+========================= */
+
+.back-btn {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    color: white;
+}
+
+/* =========================
+   PROFILE HEADER
+========================= */
+
+.profile-header {
+    background: #1b2233;
+    border: 1px solid #2f3b52;
+    border-radius: 14px;
+    padding: 25px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.avatar {
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    border:3px solid #3b82f6;
+    box-shadow:0 0 20px rgba(54, 113, 208, 0.3);
+}
+
+.profile-text h2 {
+    margin: 0;
+    font-size: 38px;
+    font-weight: 700;
+}
+
+.profile-text p {
+    margin: 5px 0;
+    color: #cbd5e1;
+}
+
+.profile-text p:first-of-type{
+    color:#9aa8c7;
+    font-size:22px;
+}
+
+.bio {
+    color: #94a3b8;
+}
+/* PROFILE BADGES */
+.profile-badges{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:12px;
+}
+
+.badge{
+    background:#0f172a;
+    border:1px solid #334155;
+    color:#cbd5e1;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    transition:0.3s;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.badge:hover{
+    border-color:#3b82f6;
+    color:white;
+    transform:translateY(-2px);
+}
+/* =========================
+   SCORE CARD
+========================= */
+
+.score-card {
+    background: #1b2233;
+    border: 1px solid #2f3b52;
+    border-radius: 14px;
+    text-align: center;
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.score-card h1 {
+    margin: 0;
+    font-size: 64px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.score-card p {
+    margin-top: 8px;
+    color: #cbd5e1;
+}
+
+.score-card{
+    transition:0.3s;
+}
+
+.score-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+.score-progress{
+    width:300px;
+    height:10px;
+    background:#0f172a;
+    border-radius:20px;
+    margin:15px auto;
+    overflow:hidden;
+}
+
+.score-fill{
+    height:100%;
+    background:#3b82f6;
+    border-radius:20px;
+}
+
+.ai-text {
+    color: #cbd5e1;
+    line-height: 1.7;
+    font-size: 15px;
+    white-space: pre-line;
+}
+
+/* =========================
+   SECTION BOX
+========================= */
+
+.section-box {
+    background: #1b2233;
+    border: 1px solid #2f3b52;
+    border-radius: 12px;
+    margin-top: 25px;
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.section-box h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #e2e8f0;
+}
+
+/* =========================
+   METRICS GRID
+========================= */
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.metric-card {
+    background: #1e293b;
+    border: 1px solid #3a475f;
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.metric-card:hover {
+    border-color: #5b6d8a;
+    transform: translateY(-2px);
+}
+
+.metric-card h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.metric-card p {
+    margin-top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* =========================
+   REPO SECTION
+========================= */
+
+.repo-section {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 0;
+    margin-top: 0;
+}
+
+.repo-section h3 {
+    margin-bottom: 15px;
+}
+
+/* ⭐ IMPORTANT: grid like reference */
+.repo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.repo-card {
+    background: #1e293b;
+    border: 1px solid #3a475f;
+    border-radius: 10px;
+    padding: 14px;
+    transition: all 0.2s ease;
+}
+
+.repo-card:hover {
+    border-color: #5b6d8a;
+    transform: translateY(-2px);
+}
+
+.repo-card h4 {
+    margin: 0 0 8px;
+}
+
+.repo-card p {
+    font-size: 14px;
+    color: #94a3b8;
+    min-height: 45px;
+}
+
+.repo-meta {
+    margin-top: 10px;
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+canvas {
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+}
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.charts-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+.chart-box {
+    width: 420px;              /* fixed clean size */
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #334155;
+}
+
+.chart-box canvas {
+    width: 100% !important;
+    height: 250px !important;  /* fixed height */
+}
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .score-card h1 {
+        font-size: 42px;
+    }
+}
