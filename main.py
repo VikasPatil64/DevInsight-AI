@@ -122,6 +122,8 @@ def dashboard(request: Request, username: str):
     repo_labels = [repo["name"] for repo in top_star_repos]
     repo_stars = [repo["stargazers_count"] for repo in top_star_repos]
     ai_insight = generate_llm_insight(profile, analytics)
+    if ai_insight in ["AI insight generation failed.", "AI service temporarily unavailable"]:
+        ai_insight = "⚠️ AI analysis currently unavailable. Core insights are still shown below."
     # Render dashboard page
     return templates.TemplateResponse(
         "dashboard.html",

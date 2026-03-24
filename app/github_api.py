@@ -14,7 +14,7 @@ def get_user_profile(username):
     url = BASE_URL + username
 
     # Send GET request to GitHub API
-    response = requests.get(url)
+    response = requests.get(url, timeout = 10)
 
     # If success → return JSON data
     if response.status_code == 200:

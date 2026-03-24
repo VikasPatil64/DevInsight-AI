@@ -1,7 +1,9 @@
+from urllib import response
+
 import requests
 import os
 
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 def generate_llm_insight(profile, analytics):
 
@@ -37,14 +39,25 @@ Keep output under 150 words..
             "Content-Type": "application/json",
         },
         json={
-            "model": "meta-llama/llama-3-8b-instruct",
+           "model": "google/gemma-7b-it:free",
             "messages": [
                 {"role": "user", "content": prompt}
             ],
         },
     )
-
+    
+# ✅ ADD THIS CHECK HERE
+    if response.status_code != 200:
+        print("API ERROR:", response.text)
+        return "AI service temporarily unavailable"
+        
     try:
-        return response.json()["choices"][0]["message"]["content"]
-    except:
+        data = response.json()
+        print("STATUS:", response.status_code)
+        print("RESPONSE:", data)
+        return data["choices"][0]["message"]["content"]
+
+    except Exception as e:
+        print("ERROR:", e)
+        print("RAW RESPONSE:", response.text)
         return "AI insight generation failed."
