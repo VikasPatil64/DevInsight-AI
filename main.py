@@ -2,6 +2,8 @@
 # IMPORTS
 # -------------------------------
 
+from fastapi.responses import StreamingResponse
+from app.pdf_generator import generate_developer_report
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -34,21 +36,15 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 # -------------------------------
-# OPTIONAL API ROUTE (JSON)
-# Keep if you want API testing
+# API ROUTE (JSON)
 # -------------------------------
 
 @app.get("/analyze/{username}")
 def analyze_user(username: str):
-
     profile = get_user_profile(username)
     repos = get_user_repos(username)
 
@@ -56,7 +52,6 @@ def analyze_user(username: str):
         return {"error": "User not found"}
 
     analytics = analyze_repositories(repos)
-
     score, category = calculate_developer_score(profile, analytics)
 
     return {
@@ -64,18 +59,101 @@ def analyze_user(username: str):
         "public_repos": profile["public_repos"],
         "followers": profile["followers"],
         "following": profile["following"],
-
         "avatar_url": profile["avatar_url"],
         "name": profile.get("name", username),
         "bio": profile.get("bio", "No bio available"),
         "created_at": profile["created_at"],
-
         "repo_count_fetched": len(repos),
-
         "analytics": analytics,
         "developer_score": score,
         "developer_category": category
     }
+
+
+# -------------------------------
+# API ENDPOINT FOR COMPARE FEATURE
+# -------------------------------
+
+@app.get("/api/analyze/{username}")
+def api_analyze_user(username: str):
+    """API endpoint for compare feature - returns JSON only"""
+    profile = get_user_profile(username)
+    repos = get_user_repos(username)
+
+    if profile is None:
+        return {"error": "User not found"}
+
+    analytics = analyze_repositories(repos)
+    score, category = calculate_developer_score(profile, analytics)
+    
+    language_labels = list(analytics.get("language_count", {}).keys())
+    language_values = list(analytics.get("language_count", {}).values())
+
+    return {
+        "username": username,
+        "name": profile.get("name", username),
+        "avatar_url": profile["avatar_url"],
+        "public_repos": profile["public_repos"],
+        "followers": profile["followers"],
+        "following": profile["following"],
+        "developer_score": score,
+        "developer_category": category,
+        "analytics": {
+            "average_stars": analytics.get("average_stars", 0),
+            "average_forks": analytics.get("average_forks", 0),
+            "most_used_language": analytics.get("most_used_language", "N/A"),
+            "total_languages": analytics.get("total_languages", 0),
+            "days_since_last_update": analytics.get("days_since_last_update", 0),
+            "top_repo_name": analytics.get("top_repo_name", "N/A")
+        }
+    }
+
+
+# -------------------------------
+# DOWNLOAD PDF ROUTE
+# -------------------------------
+
+@app.get("/download/{username}")
+async def download_pdf(username: str):
+    """Download developer report as PDF"""
+    profile = get_user_profile(username)
+    if profile is None:
+        return {"error": "User not found"}
+    
+    repos = get_user_repos(username)
+    analytics = analyze_repositories(repos)
+    score, category = calculate_developer_score(profile, analytics)
+    
+    try:
+        ai_insight = generate_llm_insight(profile, analytics)
+        if ai_insight in ["AI insight generation failed.", "AI service temporarily unavailable"]:
+            ai_insight = "AI insights temporarily unavailable"
+    except:
+        ai_insight = "AI insights not available"
+    
+    pdf_buffer = generate_developer_report(
+        username=username,
+        profile=profile,
+        analytics=analytics,
+        score=score,
+        category=category,
+        ai_insight=ai_insight
+    )
+    
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=devinsight_{username}.pdf"}
+    )
+
+
+# -------------------------------
+# COMPARE PAGE ROUTE
+# -------------------------------
+
+@app.get("/compare", response_class=HTMLResponse)
+def compare_page(request: Request):
+    return templates.TemplateResponse("compare.html", {"request": request})
 
 
 # -------------------------------
@@ -84,64 +162,43 @@ def analyze_user(username: str):
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request, username: str):
-
     profile = get_user_profile(username)
     repos = get_user_repos(username)
-    profile = get_user_profile(username)
-    # top repos 
-    top_repos = sorted(
-        repos, 
-        key = lambda x: x["stargazers_count"],
-        reverse = True
-        
-    )[:6] # Get top 6 repos
 
-    # If user not found → return landing page again
+    top_repos = sorted(repos, key=lambda x: x["stargazers_count"], reverse=True)[:6]
+
     if profile is None:
-        return templates.TemplateResponse(
-            "index.html",
-            {
-                "request": request,
-                "error": "User not found"
-            }
-        )
+        return templates.TemplateResponse("index.html", {"request": request, "error": "User not found"})
 
-    # Run analytics
     analytics = analyze_repositories(repos)
-
-    # Run scoring
     developer_score, category = calculate_developer_score(profile, analytics)
-    # Language distribution
-    language_labels = builtins.list(analytics["language_count"].keys())
-    language_values = builtins.list(analytics["language_count"].values())
+    
+    language_labels = list(analytics["language_count"].keys())
+    language_values = list(analytics["language_count"].values())
 
-    # Top 5 repos by stars
     sorted_repos = sorted(repos, key=lambda x: x["stargazers_count"], reverse=True)
     top_star_repos = sorted_repos[:5]
 
     repo_labels = [repo["name"] for repo in top_star_repos]
     repo_stars = [repo["stargazers_count"] for repo in top_star_repos]
+    
     ai_insight = generate_llm_insight(profile, analytics)
     if ai_insight in ["AI insight generation failed.", "AI service temporarily unavailable"]:
         ai_insight = "⚠️ AI analysis currently unavailable. Core insights are still shown below."
-    # Render dashboard page
+    
     return templates.TemplateResponse(
         "dashboard.html",
         {
             "request": request,
-
             "username": username,
             "public_repos": profile["public_repos"],
             "followers": profile["followers"],
             "following": profile["following"],
-
             "avatar_url": profile["avatar_url"],
             "name": profile.get("name", username),
             "bio": profile.get("bio", "No bio available"),
             "created_at": profile["created_at"],
-
             "analytics": analytics,
-
             "developer_score": developer_score,
             "category": category, 
             "top_repos": top_repos,

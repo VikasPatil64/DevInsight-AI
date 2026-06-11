@@ -78,9 +78,9 @@ def calculate_developer_score(profile_data, analytics_data):
 
     # Final Weighted Score (Phase 1)
     final_score = (
-        rec_score * 0.30 +
-        imp_score * 0.25 +
-        vol_score * 0.10
+        rec_score * 0.40 +
+        imp_score * 0.35 +
+        vol_score * 0.25
     )
 
     final_score = round(final_score)

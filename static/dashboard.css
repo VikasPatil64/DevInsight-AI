@@ -318,3 +318,27 @@ canvas {
         font-size: 42px;
     }
 }
+/* Add to bottom of dashboard.css */
+.chart-box canvas {
+    max-width: 100%;
+    height: auto;
+    min-height: 250px;
+}
+
+.download-container {
+    margin-top: 20px;
+}
+
+.download-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.download-btn:hover {
+    background: #2563eb;
+}

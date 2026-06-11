@@ -4,8 +4,17 @@ from datetime import datetime
 
 def analyze_repositories(repo_data):
 
-    if not repo_data:
-        return None
+    if not repo_data or len(repo_data) == 0:
+        return {
+            "most_used_language": "N/A",
+            "total_languages": 0,
+            "average_stars": 0,
+            "average_forks": 0,
+            "days_since_last_update": 999,
+            "top_repo_name": "None",
+            "top_repo_stars": 0,
+            "language_count": {}
+        }
 
     # Convert JSON → DataFrame
     df = pd.DataFrame(repo_data)
