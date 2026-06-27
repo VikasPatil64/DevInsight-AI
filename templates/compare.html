@@ -1,196 +1,317 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Compare Developers - DevInsight</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compare Developers — DevInsight AI</title>
+    <meta name="description" content="Compare two GitHub developers side-by-side with scores, metrics, and a radar chart." />
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="/static/dashboard.css">
-    <style>
-        .compare-form {
-            display: flex;
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .compare-form input {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            background: #1e293b;
-            color: white;
-        }
-        .compare-form button {
-            padding: 12px 24px;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .compare-form button:hover {
-            background: #2563eb;
-        }
-        .compare-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        .developer-card {
-            background: #1b2233;
-            border: 1px solid #2f3b52;
-            border-radius: 14px;
-            padding: 25px;
-            text-align: center;
-        }
-        .developer-card img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid #3b82f6;
-        }
-        .vs-badge {
-            font-size: 32px;
-            font-weight: bold;
-            color: #3b82f6;
-            text-align: center;
-            padding: 20px;
-        }
-        .winner-box {
-            background: #1b2233;
-            border: 1px solid #2f3b52;
-            border-radius: 14px;
-            padding: 25px;
-            text-align: center;
-            margin-top: 30px;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #cbd5e1;
-        }
-        .error {
-            color: #ef4444;
-            text-align: center;
-            padding: 20px;
-        }
-    </style>
 </head>
 
 <body>
-<div class="dashboard-container">
-    <a href="/" class="back-btn">← Back to Search</a>
-    
-    <h1 style="margin-bottom: 20px;">Compare Two Developers</h1>
-    
-    <div class="compare-form">
-        <input type="text" id="user1" placeholder="GitHub Username 1" value="octocat">
-        <input type="text" id="user2" placeholder="GitHub Username 2" value="gaearon">
-        <button onclick="compareUsers()">Compare →</button>
-    </div>
-    
-    <div id="results" style="display: none;">
-        <div class="compare-container">
-            <div id="user1Card" class="developer-card">Loading...</div>
-            <div id="user2Card" class="developer-card">Loading...</div>
+
+<!-- ── Navigation ─────────────────────────────────────────── -->
+<nav class="nav">
+    <div class="nav-inner">
+        <a href="/" class="nav-logo">🚀 <span>DevInsight</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Analyze</a>
+            <a href="/compare" class="nav-link active">Compare</a>
         </div>
-        <div id="winnerBox" class="winner-box"></div>
+    </div>
+</nav>
+
+<!-- ── Main Container ─────────────────────────────────────── -->
+<div class="dashboard-container">
+
+    <div class="page-header">
+        <a href="/" class="back-btn">← Back</a>
+    </div>
+
+    <h1 style="font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;">
+        Compare Developers
+    </h1>
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:0;">
+        Enter two GitHub usernames to get a side-by-side analytics comparison.
+    </p>
+
+    <!-- Compare Form -->
+    <div class="compare-form">
+        <input type="text" id="user1" placeholder="First GitHub username" value="octocat" spellcheck="false">
+        <input type="text" id="user2" placeholder="Second GitHub username" value="gaearon" spellcheck="false">
+        <button onclick="compareUsers()" id="compareBtn">Compare →</button>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" style="display:none; background:rgba(239,68,68,0.10); border:1px solid rgba(239,68,68,0.25); border-radius:12px; padding:14px 18px; margin-bottom:16px; color:#fca5a5; font-size:14px; font-weight:500;"></div>
+
+    <!-- Results Section -->
+    <div id="results" style="display:none;">
+
+        <!-- Side-by-Side Cards -->
+        <div class="compare-container">
+            <div id="user1Card" class="developer-card">
+                <!-- Skeleton -->
+                <div class="skeleton skeleton-avatar"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-sub"></div>
+                <div class="skeleton skeleton-line"></div>
+                <div class="skeleton skeleton-line" style="width:70%"></div>
+            </div>
+
+            <div class="vs-divider">
+                <div class="vs-badge">VS</div>
+            </div>
+
+            <div id="user2Card" class="developer-card">
+                <!-- Skeleton -->
+                <div class="skeleton skeleton-avatar"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-sub"></div>
+                <div class="skeleton skeleton-line"></div>
+                <div class="skeleton skeleton-line" style="width:70%"></div>
+            </div>
+        </div>
+
+        <!-- Winner Box -->
+        <div id="winnerBox" class="winner-box" style="display:none;"></div>
+
+        <!-- Radar Chart -->
+        <div id="radarBox" class="radar-box" style="display:none;">
+            <h3>Skills Radar</h3>
+            <div class="radar-canvas-wrap">
+                <canvas id="radarChart" height="380"></canvas>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
+// ──────────────────────────────────────────────────────────────
+// Chart.js global defaults
+// ──────────────────────────────────────────────────────────────
+Chart.defaults.color       = '#94a3b8';
+Chart.defaults.borderColor = 'rgba(99,130,200,0.10)';
+Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(5,13,31,0.95)';
+Chart.defaults.plugins.tooltip.borderColor     = 'rgba(99,130,200,0.20)';
+Chart.defaults.plugins.tooltip.borderWidth     = 1;
+Chart.defaults.plugins.tooltip.padding         = 12;
+Chart.defaults.plugins.tooltip.cornerRadius    = 10;
+
+// ──────────────────────────────────────────────────────────────
+// Helpers
+// ──────────────────────────────────────────────────────────────
+var radarChart = null;
+
+function showError(msg) {
+    var el = document.getElementById('errorBanner');
+    el.textContent = '⚠ ' + msg;
+    el.style.display = 'block';
+}
+
+function hideError() {
+    document.getElementById('errorBanner').style.display = 'none';
+}
+
+function norm(val, max) {
+    return Math.min(Math.round((val / max) * 100), 100);
+}
+
+function buildDevCard(data) {
+    return [
+        '<img src="' + data.avatar_url + '" alt="' + data.username + '">',
+        '<h2>' + (data.name || data.username) + '</h2>',
+        '<p>@' + data.username + '</p>',
+        '<div class="cmp-score-box">',
+        '  <h1>' + data.developer_score + '</h1>',
+        '  <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">' + (data.developer_category || '') + '</div>',
+        '</div>',
+        '<div class="cmp-stats-grid">',
+        '  <div class="cmp-stat"><strong>📦 Repos</strong><span>' + data.public_repos + '</span></div>',
+        '  <div class="cmp-stat"><strong>👥 Followers</strong><span>' + data.followers + '</span></div>',
+        '  <div class="cmp-stat"><strong>⭐ Avg Stars</strong><span>' + data.analytics.average_stars + '</span></div>',
+        '  <div class="cmp-stat"><strong>💻 Language</strong><span style="font-size:13px">' + data.analytics.most_used_language + '</span></div>',
+        '</div>'
+    ].join('');
+}
+
+function buildSkeletonCard() {
+    return [
+        '<div class="skeleton skeleton-avatar"></div>',
+        '<div class="skeleton skeleton-title"></div>',
+        '<div class="skeleton skeleton-sub"></div>',
+        '<div class="skeleton skeleton-line"></div>',
+        '<div class="skeleton skeleton-line" style="width:70%"></div>',
+        '<div class="skeleton skeleton-line" style="width:50%"></div>'
+    ].join('');
+}
+
+// ──────────────────────────────────────────────────────────────
+// Radar Chart
+// ──────────────────────────────────────────────────────────────
+function renderRadar(d1, d2) {
+    var radarBox = document.getElementById('radarBox');
+    radarBox.style.display = 'block';
+
+    var labels = ['Score','Repos','Followers','Avg Stars','Activity'];
+
+    var vals1 = [
+        d1.developer_score,
+        norm(d1.public_repos, 150),
+        norm(d1.followers, 2000),
+        norm(d1.analytics.average_stars, 50),
+        Math.max(0, 100 - norm(d1.analytics.days_since_last_update, 365))
+    ];
+    var vals2 = [
+        d2.developer_score,
+        norm(d2.public_repos, 150),
+        norm(d2.followers, 2000),
+        norm(d2.analytics.average_stars, 50),
+        Math.max(0, 100 - norm(d2.analytics.days_since_last_update, 365))
+    ];
+
+    if (radarChart) { radarChart.destroy(); }
+
+    var ctx = document.getElementById('radarChart').getContext('2d');
+    radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: d1.name || d1.username,
+                    data: vals1,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.15)',
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#050d1f',
+                    pointRadius: 4,
+                    borderWidth: 2
+                },
+                {
+                    label: d2.name || d2.username,
+                    data: vals2,
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6,182,212,0.12)',
+                    pointBackgroundColor: '#06b6d4',
+                    pointBorderColor: '#050d1f',
+                    pointRadius: 4,
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    min: 0,
+                    max: 100,
+                    grid:     { color: 'rgba(99,130,200,0.12)' },
+                    angleLines:{ color: 'rgba(99,130,200,0.12)' },
+                    pointLabels: { color: '#94a3b8', font: { size: 12, weight: '500' } },
+                    ticks: {
+                        color: '#475569',
+                        backdropColor: 'transparent',
+                        font: { size: 10 },
+                        stepSize: 25
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#94a3b8',
+                        padding: 20,
+                        usePointStyle: true,
+                        font: { size: 13, weight: '500' }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ──────────────────────────────────────────────────────────────
+// Main Compare Function
+// ──────────────────────────────────────────────────────────────
 async function compareUsers() {
-    const user1 = document.getElementById('user1').value.trim();
-    const user2 = document.getElementById('user2').value.trim();
-    
+    var user1 = document.getElementById('user1').value.trim();
+    var user2 = document.getElementById('user2').value.trim();
+
+    hideError();
+
     if (!user1 || !user2) {
-        alert('Please enter both usernames');
+        showError('Please enter both GitHub usernames to compare.');
         return;
     }
-    
-    // Show loading
+
+    var btn = document.getElementById('compareBtn');
+    btn.textContent = 'Loading…';
+    btn.disabled    = true;
+
+    // Show skeleton loading state
     document.getElementById('results').style.display = 'block';
-    document.getElementById('user1Card').innerHTML = '<div class="loading">Loading ' + user1 + '...</div>';
-    document.getElementById('user2Card').innerHTML = '<div class="loading">Loading ' + user2 + '...</div>';
-    document.getElementById('winnerBox').innerHTML = '';
-    
+    document.getElementById('user1Card').innerHTML = buildSkeletonCard();
+    document.getElementById('user2Card').innerHTML = buildSkeletonCard();
+    document.getElementById('winnerBox').style.display = 'none';
+    document.getElementById('radarBox').style.display  = 'none';
+
     try {
-        // Fetch both users in parallel
-        const [response1, response2] = await Promise.all([
-            fetch(`/api/analyze/${user1}`),
-            fetch(`/api/analyze/${user2}`)
+        var [res1, res2] = await Promise.all([
+            fetch('/api/analyze/' + encodeURIComponent(user1)),
+            fetch('/api/analyze/' + encodeURIComponent(user2))
         ]);
-        
-        const data1 = await response1.json();
-        const data2 = await response2.json();
-        
-        // Check for errors
-        if (data1.error || data2.error) {
-            throw new Error(data1.error || data2.error);
-        }
-        
-        // Display User 1
-        document.getElementById('user1Card').innerHTML = `
-            <img src="${data1.avatar_url}" alt="${data1.username}">
-            <h2>${data1.name || data1.username}</h2>
-            <p>@${data1.username}</p>
-            <div style="margin: 20px 0; padding: 15px; background: #1e293b; border-radius: 12px;">
-                <h1 style="font-size: 48px; margin: 0;">${data1.developer_score}</h1>
-                <p style="margin: 5px 0 0;">${data1.developer_category}</p>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div><strong>📚 Repos</strong><br>${data1.public_repos}</div>
-                <div><strong>👥 Followers</strong><br>${data1.followers}</div>
-                <div><strong>⭐ Avg Stars</strong><br>${data1.analytics.average_stars}</div>
-                <div><strong>💻 Language</strong><br>${data1.analytics.most_used_language}</div>
-            </div>
-        `;
-        
-        // Display User 2
-        document.getElementById('user2Card').innerHTML = `
-            <img src="${data2.avatar_url}" alt="${data2.username}">
-            <h2>${data2.name || data2.username}</h2>
-            <p>@${data2.username}</p>
-            <div style="margin: 20px 0; padding: 15px; background: #1e293b; border-radius: 12px;">
-                <h1 style="font-size: 48px; margin: 0;">${data2.developer_score}</h1>
-                <p style="margin: 5px 0 0;">${data2.developer_category}</p>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div><strong>📚 Repos</strong><br>${data2.public_repos}</div>
-                <div><strong>👥 Followers</strong><br>${data2.followers}</div>
-                <div><strong>⭐ Avg Stars</strong><br>${data2.analytics.average_stars}</div>
-                <div><strong>💻 Language</strong><br>${data2.analytics.most_used_language}</div>
-            </div>
-        `;
-        
-        // Determine winner
-        let winnerHtml = '';
+
+        var data1 = await res1.json();
+        var data2 = await res2.json();
+
+        if (data1.error) throw new Error(user1 + ': ' + data1.error);
+        if (data2.error) throw new Error(user2 + ': ' + data2.error);
+
+        // Populate cards
+        document.getElementById('user1Card').innerHTML = buildDevCard(data1);
+        document.getElementById('user2Card').innerHTML = buildDevCard(data2);
+
+        // Winner Box
+        var winnerBox = document.getElementById('winnerBox');
+        winnerBox.style.display = 'block';
+        var diff = Math.abs(data1.developer_score - data2.developer_score);
+
         if (data1.developer_score > data2.developer_score) {
-            winnerHtml = `
-                <h2>🏆 Winner: ${data1.name || data1.username} 🏆</h2>
-                <p>${data1.developer_score} vs ${data2.developer_score} (${data1.developer_score - data2.developer_score} point difference)</p>
-            `;
+            winnerBox.innerHTML = '<h2>🏆 ' + (data1.name || data1.username) + ' wins!</h2><p>' + data1.developer_score + ' vs ' + data2.developer_score + ' &mdash; <strong>' + diff + ' point lead</strong></p>';
         } else if (data2.developer_score > data1.developer_score) {
-            winnerHtml = `
-                <h2>🏆 Winner: ${data2.name || data2.username} 🏆</h2>
-                <p>${data2.developer_score} vs ${data1.developer_score} (${data2.developer_score - data1.developer_score} point difference)</p>
-            `;
+            winnerBox.innerHTML = '<h2>🏆 ' + (data2.name || data2.username) + ' wins!</h2><p>' + data2.developer_score + ' vs ' + data1.developer_score + ' &mdash; <strong>' + diff + ' point lead</strong></p>';
         } else {
-            winnerHtml = `<h2>🤝 It's a Tie! ${data1.developer_score} - ${data2.developer_score}</h2>`;
+            winnerBox.innerHTML = '<h2>🤝 It\'s a Tie!</h2><p>Both developers scored <strong>' + data1.developer_score + '</strong></p>';
         }
-        
-        document.getElementById('winnerBox').innerHTML = winnerHtml;
-        
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('user1Card').innerHTML = `<div class="error">❌ Error loading user</div>`;
-        document.getElementById('user2Card').innerHTML = `<div class="error">❌ Error loading user</div>`;
-        document.getElementById('winnerBox').innerHTML = `<div class="error">❌ ${error.message}</div>`;
+
+        // Radar Chart
+        renderRadar(data1, data2);
+
+    } catch (err) {
+        document.getElementById('user1Card').innerHTML = '<div class="error">⚠ Could not load data</div>';
+        document.getElementById('user2Card').innerHTML = '<div class="error">⚠ Could not load data</div>';
+        showError(err.message || 'An error occurred. Please try again.');
+    } finally {
+        btn.textContent = 'Compare →';
+        btn.disabled    = false;
     }
 }
 
-// Auto-load example on page load
-window.onload = function() {
+// Auto-load on page open
+window.addEventListener('DOMContentLoaded', function() {
     compareUsers();
-};
+});
 </script>
 
 </body>

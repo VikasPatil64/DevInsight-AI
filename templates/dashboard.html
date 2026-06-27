@@ -1,29 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>DevInsight Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ name }} — DevInsight AI</title>
+    <meta name="description" content="Developer analytics dashboard for {{ username }} on GitHub." />
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 
 <body>
 
+<!-- ── Navigation Bar ──────────────────────────────────────── -->
+<nav class="nav">
+    <div class="nav-inner">
+        <a href="/" class="nav-logo">🚀 <span>DevInsight</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Analyze</a>
+            <a href="/compare" class="nav-link">Compare</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Main Container ──────────────────────────────────────── -->
 <div class="dashboard-container">
 
-    <a href="/" class="back-btn">← Back to Search</a>
+    <!-- Page Header -->
+    <div class="page-header">
+        <a href="/" class="back-btn">← Back</a>
+    </div>
 
-    <!-- PROFILE + SCORE WRAPPER -->
+    <!-- ── TOP SECTION: Profile + Score + AI Insight ── -->
     <div class="top-section">
 
         <!-- PROFILE HEADER -->
         <div class="profile-header">
-            <img src="{{ avatar_url }}" class="avatar">
-
+            <img src="{{ avatar_url }}" class="avatar" alt="{{ name }} avatar">
             <div class="profile-text">
                 <h2>{{ name }}</h2>
                 <p>@{{ username }}</p>
                 <p class="bio">{{ bio }}</p>
-
                 <div class="profile-badges">
                     <span class="badge">📅 Joined {{ created_at[:10] if created_at else 'Unknown' }}</span>
                     <span class="badge">🔥 {{ analytics.days_since_last_update }} days inactive</span>
@@ -34,59 +56,99 @@
 
         <!-- SCORE CARD -->
         <div class="score-card">
-            <h1>{{ developer_score }}</h1>
-            <p>{{ category }}</p>
-            <div class="score-progress"> 
-                <div class="score-fill" id="scoreFill"></div> 
+
+            <!-- Animated SVG Ring -->
+            <div class="score-ring-container">
+                <svg viewBox="0 0 120 120" class="score-ring" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="scoreGrad" x1="1" y1="0" x2="0" y2="1">
+                            <stop offset="0%"   stop-color="#3b82f6"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="score-ring-track" cx="60" cy="60" r="50"/>
+                    <circle class="score-ring-fill"  cx="60" cy="60" r="50" id="scoreRingFill"/>
+                </svg>
+                <div class="score-ring-text">
+                    <span class="score-number" id="scoreNumber">0</span>
+                    <span class="score-unit">/ 100</span>
+                </div>
             </div>
-            
+
+            <div class="score-label" id="scoreLabel">{{ category }}</div>
+
             <div class="download-container">
-                <a href="/download/{{ username }}" class="download-btn">📄 Download PDF Report</a>
+                <a href="/download/{{ username }}" class="download-btn">📄 Download PDF</a>
             </div>
         </div>
-        
+
         <!-- AI INSIGHT BOX -->
         <div class="section-box">
             <h3>AI Developer Insight</h3>
-            <div class="ai-text">
-                {{ ai_insight }}
-            </div>
+            <div class="ai-text">{{ ai_insight }}</div>
         </div>
 
     </div>
 
-    <!-- GITHUB STATS -->
+    <!-- ── GITHUB STATS ─────────────────────────────────────── -->
     <div class="section-box">
         <h3>GitHub Stats</h3>
         <div class="metrics-grid">
-            <div class="metric-card"><p>{{ public_repos }}</p><h4>Total Repos</h4></div>
-            <div class="metric-card"><p>{{ followers }}</p><h4>Followers</h4></div>
-            <div class="metric-card"><p>{{ following }}</p><h4>Following</h4></div>
-            <div class="metric-card"><p>{{ analytics.average_stars }}</p><h4>Avg Stars</h4></div>
-            <div class="metric-card"><p>{{ analytics.average_forks }}</p><h4>Avg Forks</h4></div>
-            <div class="metric-card"><p>{{ analytics.days_since_last_update }} days</p><h4>Last Active</h4></div>
-            <div class="metric-card"><p>{{ analytics.most_used_language }}</p><h4>Primary Language</h4></div>
-            <div class="metric-card"><p>{{ analytics.top_repo_name }}</p><h4>Top Repo</h4></div>
-            <div class="metric-card"><p>{{ analytics.total_languages }}</p><h4>Total Languages</h4></div>
+            <div class="metric-card" data-icon="📦" data-value="{{ public_repos }}">
+                <h4>Total Repos</h4>
+                <p class="metric-val">{{ public_repos }}</p>
+            </div>
+            <div class="metric-card" data-icon="👥" data-value="{{ followers }}">
+                <h4>Followers</h4>
+                <p class="metric-val">{{ followers }}</p>
+            </div>
+            <div class="metric-card" data-icon="➕" data-value="{{ following }}">
+                <h4>Following</h4>
+                <p class="metric-val">{{ following }}</p>
+            </div>
+            <div class="metric-card" data-icon="⭐" data-value="{{ analytics.average_stars }}">
+                <h4>Avg Stars</h4>
+                <p class="metric-val">{{ analytics.average_stars }}</p>
+            </div>
+            <div class="metric-card" data-icon="🍴" data-value="{{ analytics.average_forks }}">
+                <h4>Avg Forks</h4>
+                <p class="metric-val">{{ analytics.average_forks }}</p>
+            </div>
+            <div class="metric-card" data-icon="🕐" data-value="{{ analytics.days_since_last_update }}">
+                <h4>Last Active</h4>
+                <p class="metric-val">{{ analytics.days_since_last_update }}d</p>
+            </div>
+            <div class="metric-card" data-icon="💻">
+                <h4>Primary Language</h4>
+                <p class="metric-val" style="font-size:18px;letter-spacing:-0.01em">{{ analytics.most_used_language }}</p>
+            </div>
+            <div class="metric-card" data-icon="🏆">
+                <h4>Top Repo</h4>
+                <p class="metric-val" style="font-size:16px;letter-spacing:-0.01em">{{ analytics.top_repo_name }}</p>
+            </div>
+            <div class="metric-card" data-icon="🌐" data-value="{{ analytics.total_languages }}">
+                <h4>Total Languages</h4>
+                <p class="metric-val">{{ analytics.total_languages }}</p>
+            </div>
         </div>
     </div>
 
-    <!-- CHARTS SECTION -->
+    <!-- ── CHARTS ─────────────────────────────────────────────── -->
     <div class="section-box">
-        <h3>Charts</h3>
+        <h3>Charts &amp; Visualizations</h3>
         <div class="charts-section">
             <div class="chart-box">
                 <h4>Language Distribution</h4>
-                <canvas id="languageChart" width="400" height="300"></canvas>
+                <canvas id="languageChart"></canvas>
             </div>
             <div class="chart-box">
-                <h4>Top 5 Repositories</h4>
-                <canvas id="repoChart" width="400" height="300"></canvas>
+                <h4>Top Repositories by Stars</h4>
+                <canvas id="repoChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- POPULAR PROJECTS -->
+    <!-- ── POPULAR PROJECTS ───────────────────────────────────── -->
     <div class="section-box">
         <h3>Popular Projects</h3>
         <div class="repo-grid">
@@ -94,72 +156,243 @@
             <div class="repo-card">
                 <h4>{{ repo.name }}</h4>
                 <p>{{ repo.description or "No description available" }}</p>
-                <div class="repo-meta">⭐ {{ repo.stargazers_count }} 🍴 {{ repo.forks_count }}</div>
+                <div class="repo-meta">
+                    <span>⭐ {{ repo.stargazers_count }}</span>
+                    <span>🍴 {{ repo.forks_count }}</span>
+                </div>
             </div>
             {% endfor %}
         </div>
     </div>
 
-</div>
+</div><!-- /.dashboard-container -->
 
 <script>
-    // Safe way to pass data from Python to JavaScript
-    const appData = {
-        developerScore: {{ developer_score }},
-        languageLabels: {{ language_labels | tojson | safe }},
-        languageValues: {{ language_values | tojson | safe }},
-        repoLabels: {{ repo_labels | tojson | safe }},
-        repoStars: {{ repo_stars | tojson | safe }}
-    };
-    
-    // Set score bar
-    document.getElementById('scoreFill').style.width = appData.developerScore + '%';
-    
-    // Language Chart
-    if (appData.languageLabels && appData.languageLabels.length > 0) {
-        const langCtx = document.getElementById('languageChart').getContext('2d');
-        new Chart(langCtx, {
-            type: 'doughnut',
-            data: {
-                labels: appData.languageLabels,
-                datasets: [{
-                    data: appData.languageValues,
-                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true
-            }
-        });
-    } else {
-        console.log('No language data available');
+// ──────────────────────────────────────────────────────────────
+// DATA from Jinja2
+// ──────────────────────────────────────────────────────────────
+var scoreValue    = {{ developer_score }};
+var langLabels    = JSON.parse('{{ language_labels | tojson | safe }}');
+var langValues    = JSON.parse('{{ language_values | tojson | safe }}');
+var repoLabels    = JSON.parse('{{ repo_labels | tojson | safe }}');
+var repoStars     = JSON.parse('{{ repo_stars | tojson | safe }}');
+
+// ──────────────────────────────────────────────────────────────
+// SCORE RING ANIMATION
+// ──────────────────────────────────────────────────────────────
+(function initScoreRing() {
+    var ring         = document.getElementById('scoreRingFill');
+    var numberEl     = document.getElementById('scoreNumber');
+    var circumference = 2 * Math.PI * 50; // r = 50
+
+    ring.style.strokeDasharray  = circumference;
+    ring.style.strokeDashoffset = circumference;
+
+    // Tier colour for the ring stroke
+    var tierColor = scoreValue >= 80 ? '#f59e0b'
+                  : scoreValue >= 60 ? '#10b981'
+                  : scoreValue >= 40 ? '#3b82f6'
+                  : scoreValue >= 20 ? '#8b5cf6'
+                  :                    '#64748b';
+
+    // Override gradient with tier colour on lower tiers
+    if (scoreValue < 40) {
+        ring.style.stroke = tierColor;
     }
-    
-    // Repository Chart
-    if (appData.repoLabels && appData.repoLabels.length > 0) {
-        const repoCtx = document.getElementById('repoChart').getContext('2d');
-        new Chart(repoCtx, {
-            type: 'bar',
-            data: {
-                labels: appData.repoLabels,
-                datasets: [{
-                    label: 'Stars',
-                    data: appData.repoStars,
-                    backgroundColor: '#3b82f6'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    y: { beginAtZero: true }
+
+    setTimeout(function() {
+        // Animate ring fill
+        ring.style.strokeDashoffset = circumference * (1 - scoreValue / 100);
+
+        // Animate number count-up
+        var start     = 0;
+        var duration  = 1200; // ms
+        var stepTime  = 16;
+        var steps     = duration / stepTime;
+        var increment = scoreValue / steps;
+        var current   = 0;
+
+        var timer = setInterval(function() {
+            current += increment;
+            if (current >= scoreValue) {
+                current = scoreValue;
+                clearInterval(timer);
+            }
+            numberEl.textContent = Math.round(current);
+        }, stepTime);
+    }, 350);
+})();
+
+// ──────────────────────────────────────────────────────────────
+// CHART.JS GLOBAL DEFAULTS (dark theme)
+// ──────────────────────────────────────────────────────────────
+Chart.defaults.color         = '#94a3b8';
+Chart.defaults.borderColor   = 'rgba(99,130,200,0.10)';
+Chart.defaults.font.family   = "'Inter', system-ui, sans-serif";
+Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(5,13,31,0.95)';
+Chart.defaults.plugins.tooltip.borderColor     = 'rgba(99,130,200,0.20)';
+Chart.defaults.plugins.tooltip.borderWidth     = 1;
+Chart.defaults.plugins.tooltip.padding         = 12;
+Chart.defaults.plugins.tooltip.titleFont       = { size: 13, weight: '600' };
+Chart.defaults.plugins.tooltip.bodyFont        = { size: 12 };
+Chart.defaults.plugins.tooltip.cornerRadius    = 10;
+
+// ──────────────────────────────────────────────────────────────
+// LANGUAGE DOUGHNUT CHART
+// ──────────────────────────────────────────────────────────────
+if (langLabels.length > 0) {
+    var langCtx = document.getElementById('languageChart').getContext('2d');
+
+    var langColors = [
+        '#3b82f6','#06b6d4','#8b5cf6','#10b981',
+        '#f59e0b','#ef4444','#f97316','#ec4899'
+    ];
+
+    // Custom centre-text plugin
+    var doughnutLabelPlugin = {
+        id: 'doughnutLabel',
+        afterDraw: function(chart) {
+            if (chart.config.type !== 'doughnut') return;
+            var ctx    = chart.ctx;
+            var cx     = chart.chartArea.left + (chart.chartArea.right  - chart.chartArea.left)  / 2;
+            var cy     = chart.chartArea.top  + (chart.chartArea.bottom - chart.chartArea.top)   / 2;
+            ctx.save();
+            ctx.textAlign    = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font         = "700 18px 'Inter', sans-serif";
+            ctx.fillStyle    = '#f1f5f9';
+            ctx.fillText(langLabels[0], cx, cy - 10);
+            ctx.font         = "500 12px 'Inter', sans-serif";
+            ctx.fillStyle    = '#64748b';
+            ctx.fillText('primary', cx, cy + 10);
+            ctx.restore();
+        }
+    };
+
+    new Chart(langCtx, {
+        type: 'doughnut',
+        data: {
+            labels: langLabels,
+            datasets: [{
+                data: langValues,
+                backgroundColor: langColors.slice(0, langLabels.length),
+                borderWidth: 2,
+                borderColor: '#050d1f',
+                hoverBorderColor: '#050d1f',
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#94a3b8',
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyleWidth: 8,
+                        font: { size: 12, weight: '500' }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+                            var pct   = Math.round(ctx.parsed / total * 100);
+                            return '  ' + ctx.label + ': ' + pct + '%';
+                        }
+                    }
                 }
             }
-        });
-    } else {
-        console.log('No repo data available');
-    }
+        },
+        plugins: [doughnutLabelPlugin]
+    });
+}
+
+// ──────────────────────────────────────────────────────────────
+// REPOSITORY BAR CHART
+// ──────────────────────────────────────────────────────────────
+if (repoLabels.length > 0) {
+    var repoCtx = document.getElementById('repoChart').getContext('2d');
+
+    // Horizontal gradient per bar
+    var barGradient = repoCtx.createLinearGradient(0, 0, repoCtx.canvas.width, 0);
+    barGradient.addColorStop(0, 'rgba(59,130,246,0.85)');
+    barGradient.addColorStop(1, 'rgba(6,182,212,0.85)');
+
+    new Chart(repoCtx, {
+        type: 'bar',
+        data: {
+            labels: repoLabels,
+            datasets: [{
+                label: 'Stars',
+                data: repoStars,
+                backgroundColor: barGradient,
+                borderRadius: 6,
+                borderSkipped: false,
+                hoverBackgroundColor: 'rgba(59,130,246,1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return '  ⭐ ' + ctx.parsed.y + ' stars';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(99,130,200,0.08)' },
+                    ticks: { color: '#64748b', font: { size: 11 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#94a3b8',
+                        font: { size: 11 },
+                        maxRotation: 30
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ──────────────────────────────────────────────────────────────
+// METRIC CARD NUMBER COUNT-UP
+// ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.metric-card[data-value]').forEach(function(card) {
+    var el     = card.querySelector('.metric-val');
+    var target = parseFloat(card.dataset.value);
+
+    if (isNaN(target) || target <= 0) return;
+
+    var duration = 900;
+    var stepTime = 16;
+    var steps    = duration / stepTime;
+    var inc      = target / steps;
+    var cur      = 0;
+
+    // Capture suffix (e.g. "d" from "45d")
+    var originalText = el.textContent.trim();
+    var suffix = originalText.replace(/[\d.]+/, '').trim();
+
+    var t = setInterval(function() {
+        cur += inc;
+        if (cur >= target) { cur = target; clearInterval(t); }
+        el.textContent = (Number.isInteger(target) ? Math.round(cur) : cur.toFixed(1)) + suffix;
+    }, stepTime);
+});
 </script>
 
 </body>

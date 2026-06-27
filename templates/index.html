@@ -1,40 +1,72 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>DevInsight AI</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevInsight AI — GitHub Developer Analytics</title>
+    <meta name="description" content="Analyze any GitHub developer's profile, score their contributions, and generate AI-powered insights instantly." />
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="/static/index.css" />
   </head>
 
   <body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
     <div class="landing">
-      <h1 class="logo">🚀 DevInsight AI</h1>
 
-      <p class="tagline">Developer intelligence from GitHub data</p>
-
-      <!-- FORM (NO JS NEEDED FOR SUBMIT) -->
-      <form action="/dashboard" method="get" class="search-form">
-        <input
-          type="text"
-          name="username"
-          id="username"
-          placeholder="Enter GitHub Username"
-          required
-        />
-
-        <button type="submit">Analyze</button>
-      </form>
-
-      <!-- Add after the search form in index.html -->
-      <div style="text-align: center; margin-top: 20px">
-        <a href="/compare" style="color: #3b82f6">Compare Two Developers →</a>
+      <!-- Logo Badge -->
+      <div class="logo-badge">
+        <span class="badge-dot"></span>
+        DevInsight AI &mdash; Live Analytics
       </div>
 
-      <!-- RECENT SEARCHES -->
+      <!-- Hero -->
+      <h1 class="logo">GitHub Intelligence<br>at a Glance</h1>
+      <p class="tagline">Enter any GitHub username to get an instant developer score, AI-powered insights, and beautiful repository analytics.</p>
+
+      <!-- Search Card -->
+      <div class="search-card">
+        <form action="/dashboard" method="get" class="search-form">
+          <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="Enter a GitHub username…"
+            autocomplete="off"
+            spellcheck="false"
+            required
+          />
+          <button type="submit">Analyze →</button>
+        </form>
+
+        <div class="compare-link">
+          <a href="/compare">⚡ Compare Two Developers</a>
+        </div>
+      </div>
+
+      <!-- Feature Highlights -->
+      <div class="feature-pills">
+        <span class="pill">📊 Developer Score</span>
+        <span class="pill">🤖 AI Insights</span>
+        <span class="pill">📈 9 Key Metrics</span>
+        <span class="pill">📄 PDF Export</span>
+        <span class="pill">⚡ Compare Mode</span>
+      </div>
+
+      <!-- Recent Profiles -->
       <div class="recent-box">
         <h3>Recent Profiles</h3>
-
         <div id="recentList" class="recent-list"></div>
       </div>
+
     </div>
 
     <script src="/static/script.js"></script>
